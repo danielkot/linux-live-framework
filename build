@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+MKISOFS=$(which mkisofs)
+if [ "$MKISOFS" = "" ]; then
+	MKISOFS=$(which genisoimage)
+fi
+if [ "$MKISOFS" = "" ]; then
+	echo "Cannot found mkisofs or genisoimage, stop"
+	exit 3
+fi
+cp -raf config .config
+echo "RELDATE='`date +"%d-%m-%Y"` - `date +"%H:%M:%S"`'" >>.config
+for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
+	if [ `echo ${i} | wc -l` -eq 2 ]; then
+		echo -e "There are too many kernels\nPlease choose your kernel to proceed:\n"	
+		list=("${i}")
+		n=1
+		echo -e "Please choose number from ${n} to ${#list[@]}\n-----"
+		for a in ${list[@]}; do
+			echo "[${n}] - ${a}"
+			n+=1
+		done
+		echo "-----"
+		read kernel
+		export kernel
+		unset list
+		unset n
+		break
+	else
+		kernel="${i}"
+	fi
+done
+echo "KERNEL=\"${kernel}\"" >>.config
+echo "LMK=/lib/modules/`file -bL ${kernel} | grep -o 'version [^ ]*' | cut -d ' ' -f 2`" >>.config
+unset kernel
+top="`pwd`"
+. .config
+cd initrd
+INITRD="./create ${DISTRO}"
+cd ..
+DATA="`mktemp -d`"
+temp_root="`mktemp -d`"
+mkdir -p ${temp_root}/rootfs
+echo "rsync --force -aA --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* / ${temp_root}/rootfs" > ${temp_root}/rsync_cmd
+chmod +x ${temp_root}/rsync_cmd
+${temp_root}/rsync_cmd && \
+mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz || rm -f ${DATA}/${DISTRO}/system.sfs && mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs || \
+{
+	echo -e "\nCan't create \"system.sfs\" file!\nAborting!\n"
+	rm -rf ${temp_root} ${DATA}
+	exit 1
+}
+BOOT="${DATA}"
+mkdir -p "${BOOT}/changes"
+mv ${INITRD} ${BOOT}/initrfs.img
+cp bootfiles/* ${BOOT}
+sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/syslinux.cfg
+cp -raf ${KERNEL} ${BOOT}/vmlinuz
+cd ${DATA}
+timedate=`date +"%d-%m-%Y"`
+${MKISOFS} -o "/${DISTRO}-${timedate}.iso" -v -J -R -D -A {DISTRO} -V ${DISTRO} -no-emul-boot -boot-info-table -boot-load-size 4 -b isolinux.bin -c isolinux.boot . || exit 1
+if command -v isohybrid >/dev/null; then
+	isohybrid "/${DISTRO}-${timedate}.iso"
+fi
+cd ${top}
+rm -rf ${temp_root} ${DATA}

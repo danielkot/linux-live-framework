@@ -1,0 +1,131 @@
+#!/bin/sh
+
+export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
+export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
+
+. /lib/.config
+
+if [ ! -e /lib/initramfs_escaped ]; then
+	SWITCH=/m
+	mkdir -p ${SWITCH}
+	mount -t tmpfs -o size="100%" tmpfs ${SWITCH}
+	cp -a /??* ${SWITCH} 2>/dev/null
+	cd ${SWITCH}
+	echo "This file indicates that we successfully escaped initramfs" > $SWITCH/lib/initramfs_escaped
+	exec switch_root -c /dev/console . $0
+fi
+
+MEMORY=/memory
+CHANGES=$MEMORY/changes
+UNION=$MEMORY/union
+DATAMNT=$MEMORY/data
+SYSTEM=$MEMORY/system
+mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM}
+
+persistent_changes()
+{
+	local CHANGES	
+	mkdir -p "$2"
+	if grep -vq perch /proc/cmdline; then
+		return
+	fi
+	mkdir -p ${1}/$(basename "$2")
+	CHANGES="${1}/$(basename "$2")"  
+	T1="$CHANGES/.empty"
+	T2="$T1"2
+	touch "$T1" 2>/dev/null && rm -f "$T1" 2>/dev/null
+	if [ $? -ne 0 ]; then
+		echo "* Persistent changes not writable or not used"
+		return
+	fi
+	echo "Testing persistent changes for posix compatibility"
+	touch "$T1" && ln -sf "$T1" "$T2" 2>/dev/null && \
+	chmod +x "$T1" 2>/dev/null && test -x "$T1" && \
+	chmod -x "$T1" 2>/dev/null && test ! -x "$T1" && \
+	rm "$T1" "$T2" 2>/dev/null
+	if [ $? -eq 0 ]; then
+		echo "* Activating native persistent changes"
+		mount --bind "$CHANGES" "$2"
+		return
+	fi
+	if [ -e "$CHANGES/changes.dat" ]; then
+		echo "* Restoring persistent changes"
+		EXISTS="true"
+	else
+		echo "* Creating new persistent changes"
+		EXISTS=""
+	fi
+	mount.dynfilefs "$CHANGES/changes.dat" 4000 "$2"
+	if [ ! "$EXISTS" ]; then
+		mke2fs -F "$2/loop.fs" >/dev/null 2>&1
+	fi
+	mount -o loop,sync "$2/loop.fs" "$2"
+	rm "$T1" "$T2" 2>/dev/null
+	rmdir "$2/lost+found" 2>/dev/null
+}
+debug_shell()
+{
+	if [ "$DEBUG_IS_ENABLED" ]; then
+		setsid sh -c 'exec sh < /dev/tty1 >/dev/tty1 2>&1'
+	fi
+}
+change_root()
+{
+	umount /proc
+	umount /sys
+	cd "$1"
+	mkdir -p run
+	mount -t tmpfs tmpfs run
+	mkdir -p run/initramfs
+	mount -o remount,ro overlayfs .
+	pivot_root . run/initramfs
+	exec chroot . init < dev/console > dev/console 2>&1
+}
+
+mkdir -p /proc /sys /etc $MEMORY
+mount -n -t proc proc /proc
+echo "0" >/proc/sys/kernel/printk
+mount -n -t sysfs sysfs /sys
+mount -n -o remount,rw rootfs /
+ln -sf /proc/mounts /etc/mtab
+if grep -q debug /proc/cmdline; then
+	DEBUG_IS_ENABLED=1
+	set -x
+else
+	DEBUG_IS_ENABLED=
+fi
+find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe 2>/dev/null
+sleep 3
+mdev -s
+if [ -e /sys/block/zram0/disksize ]; then
+	echo 536870912 > /sys/block/zram0/disksize # 512MB
+	mkswap /dev/zram0 >/dev/null
+	swapon /dev/zram0
+	echo 100 > /proc/sys/vm/swappiness
+fi
+modprobe isofs 2>/dev/null
+modprobe zram 2>/dev/null
+modprobe loop 2>/dev/null
+modprobe squashfs 2>/dev/null
+modprobe fuse 2>/dev/null
+modprobe overlayfs 2>/dev/null
+mdadm --assemble --scan
+for i in /dev/[hmnsv][dmrv][0-9a-z]* /dev/xvd[0-9a-z]* /dev/nvme[0-9]n[0-9]p[0-9a-z]*; do
+	mount ${i} ${DATAMNTP}
+	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
+		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
+		break
+	else
+		umount -f ${DATAMNT}
+	fi
+done
+persistent_changes ${SYSTEM} ${CHANGES}
+mount -t overlayfs -o upperdir=${CHANGES},lowerdir=${SYSTEM} overlayfs ${UNION}
+echo "Starting $DISTRO"
+sleep 2
+change_root "$UNION" || echo "!!ERROR occured, you shouldn't be here.!!"; sleep 3
+while :; do
+	clear
+	header "Rescue shell activated!"
+	sh
+done
