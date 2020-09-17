@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-MKISOFS=$(which mkisofs)
-if [ "$MKISOFS" = "" ]; then
-	MKISOFS=$(which genisoimage)
-fi
-if [ "$MKISOFS" = "" ]; then
-	echo "Cannot found mkisofs or genisoimage, stop"
-	exit 3
-fi
 cp -raf config .config
 echo "RELDATE='`date +"%d-%m-%Y"` - `date +"%H:%M:%S"`'" >>.config
 for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
