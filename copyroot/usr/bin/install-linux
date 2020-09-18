@@ -234,8 +234,8 @@ mount --bind /dev /mnt/`cat $TMP/pout | cut -b 6-9`/dev
 mount --bind /proc /mnt/`cat $TMP/pout | cut -b 6-9`/proc
 mount --bind /sys /mnt/`cat $TMP/pout | cut -b 6-9`/sys
 
-grub-install --compress=xz --force --root-directory=/mnt/`cat $TMP/pout | cut -b 6-9`/ --recheck `cat $TMP/pout | cut -b 1-8`
-if ! chroot /mnt/`cat $TMP/pout | cut -b 6-9` update-grub; then
+grub-install --compress=xz --force --root-directory=/mnt/`cat $TMP/pout | cut -b 6-9` --recheck `cat $TMP/pout | cut -b 1-8`
+if ! chroot /mnt/`cat $TMP/pout | cut -b 6-9` grub-mkconfig -o /boot/grub/grub.cfg; then
 	# if here is error then panic!
 	dialog --title "ERROR" --infobox "Can't generate grub.cfg file!\n---\nI'm panic!\n" 10 70
 	umount -f /mnt/`cat $TMP/pout | cut -b 6-9`/dev /mnt/`cat $TMP/pout | cut -b 6-9`/proc /mnt/`cat $TMP/pout | cut -b 6-9`/sys
