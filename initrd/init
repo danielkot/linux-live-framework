@@ -74,10 +74,15 @@ change_root()
 	umount /proc
 	umount /sys
 	cd "$1"
+	echo "proc /proc proc defaults 0 0" >etc/fstab
+	echo "sysfs /sys sysfs defaults 0 0" >>etc/fstab
+	echo "devpts /dev/pts devpts gid=5,mode=620 0 0" >>etc/fstab
+	echo "tmpfs /dev/shm tmpfs defaults 0 0" >>etc/fstab
+	echo "overlay / overlay defaults 0 0" >>etc/fstab
 	mkdir -p run
 	mount -t tmpfs tmpfs run
 	mkdir -p run/initramfs
-	#mount -o remount,ro overlayfs .
+	mount -o remount,ro overlay .
 	pivot_root . run/initramfs
 	exec chroot . init < dev/console > dev/console 2>&1
 }
