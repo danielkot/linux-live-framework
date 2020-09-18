@@ -106,7 +106,7 @@ MODULEORDER="$(cd "$INITRAMFS/$LMK/"; find -name "*.ko" | sed -r "s:^./::g" | tr
 cat $INITRAMFS/$LMK/modules.order | sed -r "s/.ko.gz\$/.ko/" | grep -E "$MODULEORDER"/foo/bar > $INITRAMFS/$LMK/_
 mv $INITRAMFS/$LMK/_ $INITRAMFS/$LMK/modules.order
 
-depmod -b $INITRAMFS `ls /lib/modules | sort`
+depmod -b $INITRAMFS `ls $INITRAMFS/lib/modules | sort`
 
 echo "root::0:0::/root:/bin/bash" >$INITRAMFS/etc/passwd
 touch $INITRAMFS/etc/{m,fs}tab
