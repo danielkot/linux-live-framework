@@ -99,10 +99,10 @@ copy_including_deps /$LMK/updates
 copy_including_deps /$LMK/modules.*
 
 cp static/mount.dynfilefs $INITRAMFS/bin
-copy_including_deps /sbin/blkid || cp static/blkid $INITRAMFS/bin
+#copy_including_deps /sbin/blkid || cp static/blkid $INITRAMFS/bin
 copy_including_deps /sbin/mdadm || cp static/mdadm $INITRAMFS/bin
 copy_including_deps /sbin/mount.ntfs-3g || cp static/mount.ntfs-3g $INITRAMFS/bin
-copy_including_deps /usr/bin/eject || cp static/eject $INITRAMFS/bin
+#copy_including_deps /usr/bin/eject || cp static/eject $INITRAMFS/bin
 
 # trim modules.order file. Perhaps we could remove it entirely
 MODULEORDER="$(cd "$INITRAMFS/$LMK/"; find -name "*.ko" | sed -r "s:^./::g" | tr "\n" "|" | sed -r "s:[.]:.:g")"
