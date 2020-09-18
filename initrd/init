@@ -110,8 +110,8 @@ modprobe fuse 2>/dev/null
 modprobe overlayfs 2>/dev/null
 mdadm --assemble --scan
 debug_shell
-for i in `blkid | cut -d: -f1 | sort`; do
-	mount ${i} ${DATAMNTP}
+for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram"`; do
+	mount ${i} ${DATAMNT}
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
