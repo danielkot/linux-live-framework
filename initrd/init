@@ -110,6 +110,7 @@ modprobe squashfs 2>/dev/null
 modprobe fuse 2>/dev/null
 modprobe overlayfs 2>/dev/null
 mdadm --assemble --scan
+debug_shell
 for i in /dev/[hmnsv][dmrv][0-9a-z]* /dev/xvd[0-9a-z]* /dev/nvme[0-9]n[0-9]p[0-9a-z]*; do
 	mount ${i} ${DATAMNTP}
 	sleep 1
@@ -123,6 +124,7 @@ for i in /dev/[hmnsv][dmrv][0-9a-z]* /dev/xvd[0-9a-z]* /dev/nvme[0-9]n[0-9]p[0-9
 done
 persistent_changes ${SYSTEM} ${CHANGES}
 mount -t overlayfs -o upperdir=${CHANGES},lowerdir=${SYSTEM} overlayfs ${UNION}
+debug_shell
 echo "Starting $DISTRO"
 sleep 2
 change_root "$UNION" || echo "!!ERROR occured, you shouldn't be here.!!"; sleep 3
