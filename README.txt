@@ -15,7 +15,7 @@ Note:
 	* Your linux kernel must have overlayfs and squashfs module.
 		- If xz compression is not found, mksquashfs uses default settings - mostly gzip.
 	* Installer is included in this project.
-		- In your booted linux distro, open terminal and type as root `install-linux`
+		- In your booted linux distro, open terminal and type as root `install-linux`.
 		- In order to install your distro to hdd you also must have installed:
 			- dialog,
 			- fdisk,
@@ -34,7 +34,7 @@ Note:
 			- cd to /mnt/sda1,
 			- Add executable permission by: `chmod +x bootinst.sh`,
 			- Run: `./bootinst.sh`,
-			- Cleanup: umount -f /mnt/sda1 /mnt/iso && rmdir /mnt/sda1 /mnt/iso
+			- Cleanup: umount -f /mnt/sda1 /mnt/iso && rmdir /mnt/sda1 /mnt/iso,
 			- Now `reboot` to your frugal mode linux distro.
 		- For Windows (Only 4 GB free space in frugal mode due to fat32 limits):
 			- Format partition to fat32 (is more stable that ntfs),
@@ -47,7 +47,7 @@ Note:
 		- No UEFI at this time!
 	* You should be chrooted to linux distro.
 	* You should not be run that tool on *YOUR* **REAL** running linux.
-	* The final iso image will be on your root device (means /)
+	* The final iso image will be on your root device (means /).
 
 Authors:
 	- Daniel K. (https://github.com/danielkot)
