@@ -1,21 +1,14 @@
 #!/usr/bin/env bash
 
-for i in genisoimage mkisofs; do
-	if [ -e `command -v ${i}` ]; then
-		IMAGER="${i}"
-		break
-	else
-		echo "Please install ${i}"
-		fail="true"
+IMAGER=$(command -v mkisofs)
+[ "${IMAGER}" = "" ] && IMAGER=$(command -v genisoimage)
+[ "${IMAGER}" = "" ] && echo "Cannot found mkisofs or genisoimage" && exit 1
+for i in mksquashfs cpio gzip sed bash; do
+	if [ ! -e `command -v ${i}` ]; then
+		echo "Please install ${i} app to run this tool"
+		exit 1
 	fi
 done
-[ ${fail}="true" ] && echo "Please install above apps to run this tool" && exit 1
-fail=""
-for i in mksquashfs cpio gzip sed bash; do
-	[ ! -e `command -v ${i}` ] && echo "Please install ${i}" && fail="true"
-done
-[ ${fail}="true" ] && echo "Please install above apps to run this installer" && exit 1
-unset fail
 
 cp -raf config .config
 for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
