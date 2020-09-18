@@ -30,7 +30,7 @@ Note:
 			- Create directory (for ex. /mnt/sda1),
 			- Mount /dev/sda1 to /mnt/sda1,
 			- Create loop directory to unpack files from iso image (for ex. /mnt/iso),
-			- Mount YOUR_BUILD_DISTRO_LINUX_WITH_THIS_TOOL.iso /mnt/iso,
+			- Mount YOUR_BUILT_LINUX_DISTRO_WITH_THIS_TOOL.iso /mnt/iso,
 			- Copy files from /mnt/iso to /mnt/sda1,
 			- cd to /mnt/sda1,
 			- Add executable permission by: `chmod +x bootinst.sh`,
