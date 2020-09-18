@@ -72,9 +72,7 @@ debug_shell()
 change_root()
 {
 	cd "$1"
-	mount --move /dev dev
-	mount --move /proc proc
-	mount --move /sys sys
+	umount -f /sys /proc
 	echo "proc /proc proc defaults 0 0" >etc/fstab
 	echo "sysfs /sys sysfs defaults 0 0" >>etc/fstab
 	echo "devpts /dev/pts devpts gid=5,mode=620 0 0" >>etc/fstab
@@ -109,12 +107,6 @@ if [ -e /sys/block/zram0/disksize ]; then
 	swapon /dev/zram0
 	echo 100 > /proc/sys/vm/swappiness
 fi
-modprobe isofs 2>/dev/null
-modprobe zram 2>/dev/null
-modprobe loop 2>/dev/null
-modprobe squashfs 2>/dev/null
-modprobe fuse 2>/dev/null
-modprobe overlayfs 2>/dev/null
 mdadm --assemble --scan
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram"`; do
