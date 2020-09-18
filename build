@@ -44,6 +44,7 @@ unset kernel
 top="`pwd`"
 . .config
 cd initrd
+chmod +x create
 INITRD="./create ${DISTRO}"
 cd ..
 DATA="`mktemp -d`"
