@@ -71,9 +71,10 @@ debug_shell()
 }
 change_root()
 {
-	umount /proc
-	umount /sys
 	cd "$1"
+	mount --move /dev dev
+	mount --move /proc proc
+	mount --move /sys sys
 	echo "proc /proc proc defaults 0 0" >etc/fstab
 	echo "sysfs /sys sysfs defaults 0 0" >>etc/fstab
 	echo "devpts /dev/pts devpts gid=5,mode=620 0 0" >>etc/fstab
