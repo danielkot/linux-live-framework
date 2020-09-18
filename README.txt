@@ -10,6 +10,7 @@ Note:
 		- cpio,
 		- gzip,
 		- sed,
+		- grep,
 		- bash.
 	* Your linux kernel must have overlayfs and squashfs module.
 		- If xz compression is not found, mksquashfs uses default settings - mostly gzip.
@@ -19,8 +20,6 @@ Note:
 			- dialog,
 			- fdisk,
 			- cfdisk,
-			- sed,
-			- grep,
 			- mke2fs,
 			- grub2.
 	* You can also boot your linux distro in frugal mode (for Windows and Linux):
