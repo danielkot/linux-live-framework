@@ -11,7 +11,8 @@ Note:
 		- gzip,
 		- sed,
 		- bash.
-	* Your linux kernel must have overlayfs and squashfs (if xz compression is not found mksquashfs uses default setting - mostly gzip) module.
+	* Your linux kernel must have overlayfs and squashfs module.
+		- If xz compression is not found, mksquashfs uses default setting - mostly gzip.
 	* You should be chrooted to linux distro.
 	* You should not be run that tool on *YOUR* **REAL** running linux.
 
