@@ -36,12 +36,14 @@ mkdir -p ${temp_root}/rootfs ${DATA}/changes ${DATA}/${DISTRO}
 echo "rsync --force -aA --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* / ${temp_root}/rootfs" > ${temp_root}/rsync_cmd
 chmod +x ${temp_root}/rsync_cmd
 ${temp_root}/rsync_cmd && \
-mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz || rm -f ${DATA}/${DISTRO}/system.sfs && mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs || \
-{
-	echo -e "\nCan't create \"system.sfs\" file!\nAborting!\n"
-	rm -rf ${temp_root} ${DATA}
-	exit 1
-}
+if ! mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz; then
+	rm -f ${DATA}/${DISTRO}/system.sfs
+	if ! mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs; then
+		echo -e "\nCan't create \"system.sfs\" file!\nAborting!\n"
+		rm -rf ${temp_root} ${DATA}
+		exit 1
+	fi
+fi
 mv ${INITRD} ${BOOT}/initrfs.img
 cp bootfiles/* ${BOOT}
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/syslinux.cfg
