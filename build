@@ -47,7 +47,7 @@ mkdir -p ${temp_root}/rootfs ${DATA}/changes ${DATA}/${DISTRO}
 echo "rsync --force -aA --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* / ${temp_root}/rootfs" > ${temp_root}/rsync_cmd
 chmod +x ${temp_root}/rsync_cmd
 chmod +x -R copyroot
-cp -raf copyroot/* ${temp_root}
+cp -raf copyroot/* ${temp_root}/rootfs
 ${temp_root}/rsync_cmd && \
 if ! mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz; then
 	rm -f ${DATA}/${DISTRO}/system.sfs
