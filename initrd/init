@@ -23,15 +23,14 @@ SYSTEM=$MEMORY/system
 mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM}
 
 persistent_changes()
-{
-	local CHANGES	
+{	
 	mkdir -p "$2"
 	if grep -vq perch /proc/cmdline; then
 		return
 	fi
 	mkdir -p ${1}/$(basename "$2")
-	CHANGES="${1}/$(basename "$2")"  
-	T1="$CHANGES/.empty"
+	CHANGES1="${1}/$(basename "$2")"  
+	T1="$CHANGES1/.empty"
 	T2="$T1"2
 	touch "$T1" 2>/dev/null && rm -f "$T1" 2>/dev/null
 	if [ $? -ne 0 ]; then
@@ -48,14 +47,14 @@ persistent_changes()
 		mount --bind "$CHANGES" "$2"
 		return
 	fi
-	if [ -e "$CHANGES/changes.dat" ]; then
+	if [ -e "$CHANGES1/changes.dat" ]; then
 		echo "* Restoring persistent changes"
 		EXISTS="true"
 	else
 		echo "* Creating new persistent changes"
 		EXISTS=""
 	fi
-	mount.dynfilefs "$CHANGES/changes.dat" 4000 "$2"
+	mount.dynfilefs "$CHANGES1/changes.dat" 4000 "$2"
 	if [ ! "$EXISTS" ]; then
 		mke2fs -F "$2/loop.fs" >/dev/null 2>&1
 	fi
@@ -77,7 +76,7 @@ change_root()
 	mkdir -p run
 	mount -t tmpfs tmpfs run
 	mkdir -p run/initramfs
-	mount -o remount,ro overlayfs .
+	#mount -o remount,ro overlayfs .
 	pivot_root . run/initramfs
 	exec chroot . init < dev/console > dev/console 2>&1
 }
@@ -111,7 +110,7 @@ modprobe fuse 2>/dev/null
 modprobe overlayfs 2>/dev/null
 mdadm --assemble --scan
 debug_shell
-for i in /dev/[hmnsv][dmrv][0-9a-z]* /dev/xvd[0-9a-z]* /dev/nvme[0-9]n[0-9]p[0-9a-z]*; do
+for i in `blkid | cut -d: -f1 | sort`; do
 	mount ${i} ${DATAMNTP}
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
