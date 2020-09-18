@@ -30,8 +30,9 @@ cd initrd
 INITRD="./create ${DISTRO}"
 cd ..
 DATA="`mktemp -d`"
+BOOT="${DATA}"
 temp_root="`mktemp -d`"
-mkdir -p ${temp_root}/rootfs
+mkdir -p ${temp_root}/rootfs ${DATA}/changes ${DATA}/${DISTRO}
 echo "rsync --force -aA --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* / ${temp_root}/rootfs" > ${temp_root}/rsync_cmd
 chmod +x ${temp_root}/rsync_cmd
 ${temp_root}/rsync_cmd && \
@@ -41,8 +42,6 @@ mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz || rm -f ${
 	rm -rf ${temp_root} ${DATA}
 	exit 1
 }
-BOOT="${DATA}"
-mkdir -p "${BOOT}/changes"
 mv ${INITRD} ${BOOT}/initrfs.img
 cp bootfiles/* ${BOOT}
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/syslinux.cfg
