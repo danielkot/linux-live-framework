@@ -48,6 +48,7 @@ Note:
 		- No UEFI at this time!
 	* You should be chrooted to linux distro.
 	* You should not be run that tool on *YOUR* **REAL** running linux.
+	* The final iso image will be on your root device (means /)
 
 Authors:
 	- Daniel K. (https://github.com/danielkot)
