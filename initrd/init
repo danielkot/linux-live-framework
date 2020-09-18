@@ -112,8 +112,10 @@ modprobe overlayfs 2>/dev/null
 mdadm --assemble --scan
 for i in /dev/[hmnsv][dmrv][0-9a-z]* /dev/xvd[0-9a-z]* /dev/nvme[0-9]n[0-9]p[0-9a-z]*; do
 	mount ${i} ${DATAMNTP}
+	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
+		sleep 1
 		break
 	else
 		umount -f ${DATAMNT}
