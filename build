@@ -38,7 +38,7 @@ top="`pwd`"
 . .config
 cd initrd
 chmod +x create
-INITRD="./create ${DISTRO}"
+INITRD="`./create ${DISTRO}`"
 cd ..
 DATA="`mktemp -d`"
 BOOT="${DATA}"
@@ -56,7 +56,7 @@ if ! mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz; then
 		exit 1
 	fi
 fi
-cp -raf ${INITRD} ${BOOT}/initrfs.img
+mv ${INITRD} ${BOOT}/initrfs.img
 cp bootfiles/* ${BOOT}
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/syslinux.cfg
 cp -raf ${KERNEL} ${BOOT}/vmlinuz
