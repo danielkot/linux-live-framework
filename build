@@ -18,7 +18,7 @@ for i in `find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`; do
 		n=1
 		echo -e "Please choose number from ${n} to ${#list[@]}\n-----"
 		for a in ${list[@]}; do
-			echo "Type ${n} to choose ${a}"
+			echo "[${n}] - ${a}"
 			n+=1
 		done
 		echo "-----"
