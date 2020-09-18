@@ -13,7 +13,6 @@ for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
 		done
 		echo "-----"
 		read kernel
-		export kernel
 		unset list
 		unset n
 		break
