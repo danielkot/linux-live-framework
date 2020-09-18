@@ -208,7 +208,7 @@ if [ $? = 1 ] ; then
 exit
 fi 
 
-echo "rsync --force -ar /run/initramfs/memory/bundles/00_system.sfs/* /mnt/`cat $TMP/pout | cut -b 6-9`" > $TMP/rsync_cmd
+echo "rsync --force -ar /run/initramfs/memory/system/* /mnt/`cat $TMP/pout | cut -b 6-9`" > $TMP/rsync_cmd
 chmod +x $TMP/rsync_cmd
 
 #from: https://www.linuxquestions.org/questions/programming-9/dialog-command-buffering-problem-in-pipe-4175423593/#post4762038
