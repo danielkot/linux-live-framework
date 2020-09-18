@@ -22,7 +22,7 @@ for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
 	fi
 done
 echo "KERNEL=\"${kernel}\"" >>.config
-echo "LMK=/lib/modules/`file -bL ${kernel} | grep -o 'version [^ ]*' | cut -d ' ' -f 2`" >>.config
+echo "LMK=\"/lib/modules/`file -bL ${kernel} | grep -o 'version [^ ]*' | cut -d ' ' -f 2`\"" >>.config
 unset kernel
 top="`pwd`"
 . .config
