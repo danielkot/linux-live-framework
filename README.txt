@@ -12,7 +12,7 @@ Note:
 		- sed,
 		- bash.
 	* Your linux kernel must have overlayfs and squashfs module.
-		- If xz compression is not found, mksquashfs uses default setting - mostly gzip.
+		- If xz compression is not found, mksquashfs uses default settings - mostly gzip.
 	* Installer is included in this project.
 		- In your booted linux distro, open terminal and type as root `install-linux`
 		- In order to install your distro to hdd you also must have installed:
