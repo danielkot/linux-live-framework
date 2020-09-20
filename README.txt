@@ -11,6 +11,7 @@ Note:
 		- gzip,
 		- sed,
 		- grep,
+		- rsync,
 		- bash.
 	* Your linux kernel must have overlayfs and squashfs module.
 		- If xz compression is not found, mksquashfs uses default settings - mostly gzip.
