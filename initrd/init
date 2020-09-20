@@ -86,18 +86,17 @@ change_root()
 	exec chroot . init < dev/console > dev/console 2>&1
 }
 
-mkdir -p /proc /sys /etc $MEMORY
-mount -n -t proc proc /proc
-echo "0" >/proc/sys/kernel/printk
-mount -n -t sysfs sysfs /sys
-mount -n -o remount,rw rootfs /
-ln -sf /proc/mounts /etc/mtab
 if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
 else
 	DEBUG_IS_ENABLED=
 fi
+mkdir -p /proc /sys /etc $MEMORY
+mount -n -t proc proc /proc
+echo "0" >/proc/sys/kernel/printk
+mount -n -t sysfs sysfs /sys
+ln -sf /proc/mounts /etc/mtab
 find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe 2>/dev/null
 sleep 3
 mdev -s
