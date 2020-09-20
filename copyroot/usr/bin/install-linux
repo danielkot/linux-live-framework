@@ -13,9 +13,6 @@ if [ $? = 1 ] ; then
 exit
 fi
 
-# umount harddisk for running cfdisk
-umount -f /mnt/* 2>/dev/null
-
 # run cfdisk to partition the harddrive
 dialog --clear --title "PARTITION THE HARDDISK" --msgbox "Generic installer will now start 'cfdisk' so that you are able to create new partitions for Generic.\n\n Two partitions are recommended. 1 for the system and 1 for SWAP.\n\n I think 3 GB are enough for the root-partition - Generic plus additional programs - and twice the amount of your RAM for the swap-partition.\n\n Just follow the menu, store your changes and quit cfdisk to go on!\n\n IMPORTANT: Read the instructions and the output of cfdisk carefully. Sometimes you have to reboot to update the partition table!" 20 70
 if [ $? = 1 ] ; then
@@ -23,13 +20,12 @@ exit
 fi
 
 # Create partitions using fdisk or cfdisk.
-
 TMP=/tmp/tmp
 if [ ! -d $TMP ]; then
   mkdir -p $TMP
 fi
 
-fdisk -l | grep -vE loop | grep -vE zram | sed -n 's/^Disk \(\/dev\/[^:]*\): \([^,]*\).*$/"\1" "\2" \\/p' >> $TMP/drivelist
+fdisk -l | grep -vE "loop|zram" | sed -n 's/^Disk \(\/dev\/[^:]*\): \([^,]*\).*$/"\1" "\2" \\/p' >> $TMP/drivelist
 
 while [ 0 ]; do
   echo dialog --ok-label Select \
@@ -215,11 +211,7 @@ chmod +x $TMP/rsync_cmd
 dialog --title "COPYING PROCESS" --msgbox "Generic installer is copying the system to your harddisk.\n\n Please be patient ... it may take up to 10 minutes depending on your system!" 10 70
 $TMP/rsync_cmd
 
-mkdir -p /mnt/`cat $TMP/pout | cut -b 6-9`/dev 2>/dev/null
-mkdir -p /mnt/`cat $TMP/pout | cut -b 6-9`/proc 2>/dev/null
-mkdir -p /mnt/`cat $TMP/pout | cut -b 6-9`/sys 2>/dev/null
-mkdir -p /mnt/`cat $TMP/pout | cut -b 6-9`/tmp 2>/dev/null
-mkdir -p /mnt/`cat $TMP/pout | cut -b 6-9`/media 2>/dev/null
+mkdir -p /mnt/`cat $TMP/pout | cut -b 6-9`/dev /mnt/`cat $TMP/pout | cut -b 6-9`/proc /mnt/`cat $TMP/pout | cut -b 6-9`/sys /mnt/`cat $TMP/pout | cut -b 6-9`/tmp
 
 dialog --clear --title "TRANSACTION FINISHED" --msgbox "Now Generic installer has finished the transaction." 10 70
 if [ $? = 1 ] ; then
@@ -234,7 +226,7 @@ mount --bind /dev /mnt/`cat $TMP/pout | cut -b 6-9`/dev
 mount --bind /proc /mnt/`cat $TMP/pout | cut -b 6-9`/proc
 mount --bind /sys /mnt/`cat $TMP/pout | cut -b 6-9`/sys
 
-grub-install --compress=xz --force --root-directory=/mnt/`cat $TMP/pout | cut -b 6-9` --recheck `cat $TMP/pout | cut -b 1-8`
+grub-install --compress=xz --recheck --force --root-directory=/mnt/`cat $TMP/pout | cut -b 6-9` --recheck `cat $TMP/pout | cut -b 1-8`
 if ! chroot /mnt/`cat $TMP/pout | cut -b 6-9` grub-mkconfig -o /boot/grub/grub.cfg; then
 	# if here is error then panic!
 	dialog --title "ERROR" --infobox "Can't generate grub.cfg file!\n---\nI'm panic!\n" 10 70
