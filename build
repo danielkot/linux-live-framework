@@ -10,7 +10,7 @@ for i in mksquashfs cpio gzip sed bash grep; do
 	fi
 done
 
-cp -raf config .config
+cp -f config .config
 for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
 	if [ `echo ${i} | wc -l` -eq 2 ]; then
 		list=("${i}")
