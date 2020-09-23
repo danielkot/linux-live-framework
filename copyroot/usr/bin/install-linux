@@ -152,7 +152,7 @@ $SWAP_PART as a Linux swap partition (and checking for bad blocks)..." 4 55
 fi  
 
 # format root partition
-fdisk -l | grep -vE loop | grep -vE zram | grep Linux | sed -e '/swap/d' | cut -b 1-9 > $TMP/pout 2>/dev/null
+fdisk -l | grep -vE "loop|zram" | grep Linux | sed -e '/swap/d' | cut -b 1-9 > $TMP/pout 2>/dev/null
 
 dialog --clear --title "ROOT PARTITION DETECTED" --exit-label OK --msgbox "Generic installer has detected\n\n `cat /tmp/tmp/pout` \n\n as your linux partition(s).\n\n In the next box you can choose the linux filesystem for your root partition or choose the partition if you have more linux partitions!" 20 70
 if [ $? = 1 ] ; then
