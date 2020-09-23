@@ -25,7 +25,7 @@ if [ ! -d $TMP ]; then
   mkdir -p $TMP
 fi
 
-fdisk -l | grep -vE "loop|zram" | sed -n 's/^Disk \(\/dev\/[^:]*\): \([^,]*\).*$/"\1" "\2" \\/p' >> $TMP/drivelist
+fdisk -l | grep -vE "loop|zram|ram" | sed -n 's/^Disk \(\/dev\/[^:]*\): \([^,]*\).*$/"\1" "\2" \\/p' >> $TMP/drivelist
 
 while [ 0 ]; do
   echo dialog --ok-label Select \
@@ -152,7 +152,7 @@ $SWAP_PART as a Linux swap partition (and checking for bad blocks)..." 4 55
 fi  
 
 # format root partition
-fdisk -l | grep -vE "loop|zram" | grep Linux | sed -e '/swap/d' | cut -b 1-9 > $TMP/pout 2>/dev/null
+fdisk -l | grep -vE "loop|zram|ram" | grep Linux | sed -e '/swap/d' | cut -b 1-9 > $TMP/pout 2>/dev/null
 
 dialog --clear --title "ROOT PARTITION DETECTED" --exit-label OK --msgbox "Generic installer has detected\n\n `cat /tmp/tmp/pout` \n\n as your linux partition(s).\n\n In the next box you can choose the linux filesystem for your root partition or choose the partition if you have more linux partitions!" 20 70
 if [ $? = 1 ] ; then
@@ -160,7 +160,7 @@ exit
 fi
 
 # choose root partition
-dialog --clear --title "CHOOSE ROOT PARTITION" --inputbox "Please give me your preferred root partition in this way:\n\n /dev/hdaX --- X = number of the partition, e. g. 2 for /dev/hda2!" 10 70 2> $TMP/pout
+dialog --clear --title "CHOOSE ROOT PARTITION" --inputbox "Please give me your prefered root partition in this way:\n\n /dev/hdaX --- X = number of the partition, e. g. 2 for /dev/hda2!" 10 70 2> $TMP/pout
 
 dialog --clear --title "FORMAT ROOT PARTITION" --radiolist "Now you can choose the filesystem for your root partition.\n" 10 70 0 \
 "1" "ext2" off \
@@ -256,7 +256,7 @@ echo "$hostname" > /mnt/`cat $TMP/pout | cut -b 6-9`/etc/hostname
 }
 
 echo "
-Installation sem to be complete!
+Installation completed!
 --------------------------------
 "
 sleep 4
@@ -269,9 +269,9 @@ Would you like to reboot in to new system?
 "
 read choice
 case $choice in
-[Yy][Ee][Ss]|[Yy])	reboot ;;
-[Nn][Oo]|[Nn])	exit ;;
-*)	echo "Bad option '${choice}'"; sleep 2; finish ;;
+[Yy][Ee][Ss]|[Yy]) reboot ;;
+[Nn][Oo]|[Nn]) exit ;;
+*) echo "Bad option '${choice}'"; sleep 2; finish ;;
 esac
 }
 
