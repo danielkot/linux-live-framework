@@ -108,7 +108,7 @@ if [ -e /sys/block/zram0/disksize ]; then
 fi
 mdadm --assemble --scan
 debug_shell
-for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram"`; do
+for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	mount ${i} ${DATAMNT}
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
