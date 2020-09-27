@@ -14,7 +14,7 @@ cp -f config .config
 for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
 	if [ `echo ${i} | wc -l` != 1 ]; then
 		list=("${i}")
-		n=1
+		n=0
 		echo -e "There are too many kernels\nPlease choose your kernel to proceed:\nPlease choose number from ${n} to ${#list[@]}\n-----"
 		for a in ${list[@]}; do
 			echo "[${n}] - ${a}"
