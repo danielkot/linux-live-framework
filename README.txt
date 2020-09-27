@@ -36,7 +36,7 @@ Note:
 			- cd to /mnt/sda1,
 			- Add executable permission by: `chmod +x bootinst.sh`,
 			- Run: `./bootinst.sh`,
-			- Cleanup: umount -f /mnt/sda1 /mnt/iso && rmdir /mnt/sda1 /mnt/iso,
+			- Cleanup: `umount -f /mnt/sda1 /mnt/iso && rmdir /mnt/sda1 /mnt/iso`,
 			- Now `reboot` to your frugal mode linux distro.
 		- For Windows (Only 4 GB free space in frugal mode due to fat32 limits):
 			- Format partition to fat32 (is more stable that ntfs),
