@@ -32,6 +32,7 @@ for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\"`"; do
 done
 echo "KERNEL=\"${kernel}\"" >>.config
 echo "LMK=\"/lib/modules/`file -bL ${kernel} | grep -o 'version [^ ]*' | cut -d ' ' -f 2`\"" >>.config
+[ ! -z ${WITH_PERCH} ] && echo "WITH_PERCH=\"true\"" >>.config
 unset kernel
 top="`pwd`"
 . .config
@@ -69,8 +70,6 @@ cp -f ${KERNEL} ${BOOT}/vmlinuz
 cd ${DATA}
 timedate="`date +"%d-%m-%Y"`"
 ${IMAGER} -o /${DISTRO}-${timedate}.iso -J -R -D -A ${DISTRO} -V ${DISTRO} -no-emul-boot -boot-info-table -boot-load-size 4 -b isolinux.bin -c isolinux.boot .
-if command -v isohybrid >/dev/null; then
-	isohybrid "/${DISTRO}-${timedate}.iso"
-fi
+command -v isohybrid >/dev/null && isohybrid "/${DISTRO}-${timedate}.iso"
 cd ${top}
 rm -rf ${temp_root} ${DATA}
