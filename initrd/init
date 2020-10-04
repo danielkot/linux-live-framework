@@ -127,6 +127,6 @@ sleep 2
 change_root "$UNION" || echo "!!ERROR occured, you shouldn't be here.!!"; sleep 3
 while :; do
 	clear
-	header "Rescue shell activated!"
+	echo "Rescue shell activated!"
 	sh
 done
