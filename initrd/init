@@ -12,7 +12,7 @@ if [ ! -e /lib/initramfs_escaped ]; then
 	cp -a /??* ${SWITCH} 2>/dev/null
 	cd ${SWITCH}
 	touch $SWITCH/lib/initramfs_escaped
-	exec switch_root -c /dev/console . $0
+	exec switch_root . $0
 fi
 
 MEMORY=/memory
