@@ -83,6 +83,7 @@ if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
 fi
+debug_shell
 mount -n -t proc proc /proc
 echo "0" >/proc/sys/kernel/printk
 mount -n -t sysfs sysfs /sys
