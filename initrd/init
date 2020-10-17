@@ -77,7 +77,7 @@ change_root()
 	mkdir -p run/initramfs
 	mount -o remount,ro overlay .
 	pivot_root . run/initramfs
-	exec chroot . init
+	exec init
 }
 
 if grep -q debug /proc/cmdline; then
