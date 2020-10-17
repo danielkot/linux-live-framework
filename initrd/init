@@ -83,7 +83,6 @@ if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
 fi
-mkdir -p /proc /sys /etc $MEMORY
 mount -n -t proc proc /proc
 echo "0" >/proc/sys/kernel/printk
 mount -n -t sysfs sysfs /sys
@@ -92,10 +91,10 @@ find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -
 sleep 3
 mdev -s
 if [ -e /sys/block/zram0/disksize ]; then
-	echo 536870912 > /sys/block/zram0/disksize # 512MB
+	echo 536870912 >/sys/block/zram0/disksize # 512MB
 	mkswap /dev/zram0 >/dev/null
 	swapon /dev/zram0
-	echo 100 > /proc/sys/vm/swappiness
+	echo 100 >/proc/sys/vm/swappiness
 fi
 mdadm --assemble --scan
 debug_shell
