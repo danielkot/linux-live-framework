@@ -27,7 +27,6 @@ persistent_changes()
 {	
 	mkdir -p "$2"
 	if grep -vq perch /proc/cmdline; then
-		mount -t tmpfs tmpfs ${CHANGES}
 		return
 	fi
 	mkdir -p ${1}/$(basename "$2")
