@@ -8,7 +8,7 @@ Note:
 		- squashfs-tools,
 		- genisoimage or mkisofs,
 		- cpio,
-		- gzip,
+		- xz-utils,
 		- sed,
 		- grep,
 		- rsync,
