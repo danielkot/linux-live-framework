@@ -118,7 +118,7 @@ cp ../.config $INITRAMFS/lib
 chmod a+x $INITRAMFS/bin/*
 
 cd $INITRAMFS
-find . | cpio -o -H newc | gzip -cf9 >$INITRAMFS.img
+find . | cpio -o -H newc | xz -cf9e -Ccrc32 >$INITRAMFS.img
 echo $INITRAMFS.img
 
 cd ..
