@@ -39,8 +39,8 @@ Note:
 			- Cleanup: `umount -f /mnt/sda1 /mnt/iso && rmdir /mnt/sda1 /mnt/iso`,
 			- Now `reboot` to your frugal mode linux distro.
 		- For Windows (Only 4 GB free space in frugal mode due to fat32 limits):
-			- Format partition to fat32 (is more stable that ntfs),
-			- Copy files from iso image to formated d:\ for example,
+			- Format partition (for ex. d:\) to fat32 (is more stable that ntfs),
+			- Copy files from iso image to formated d:\,
 			- Open cmd as admin,
 			- cd to d:\,
 			- Run in cmd `bootinst.bat`,
@@ -49,7 +49,7 @@ Note:
 		- No UEFI at this time!
 	* You should be chrooted to linux distro.
 	* You should not be run that tool on *YOUR* **REAL** running linux.
-	* The final iso image will be on your root device (means /).
+	* The final iso image will be in your root device (means /) (If you ran this tool in *YOUR* **REAL** running linux) or in your chrooted linux distro (means /path/to/chroot/folder).
 
 Authors:
 	- Daniel K. (https://github.com/danielkot)
