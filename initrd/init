@@ -29,8 +29,8 @@ persistent_changes()
 	if grep -vq perch /proc/cmdline; then
 		return
 	fi
-	mkdir -p ${1}/$(basename "$2")
-	CHANGES1="${1}/$(basename "$2")"  
+	mkdir -p ${DATAMNT}/changes
+	CHANGES1="${DATAMNT}/changes"
 	T1="$CHANGES1/.empty"
 	T2="$T1"2
 	touch "$T1" 2>/dev/null && rm -f "$T1" 2>/dev/null
