@@ -26,8 +26,8 @@ copy_including_deps()
         copy_including_deps "$LIB"
      done
 
-   for MOD in $(find "$1" -type f | grep .ko); do
-      for DEP in $(cat /$LMK/modules.dep | fgrep /$(basename $MOD):); do
+   for MOD in $(find "$1" -type f -name "*.ko"); do
+      for DEP in $(fgrep /$(basename $MOD /$LMK/modules.dep):); do
          copy_including_deps "/$LMK/$DEP"
       done
    done
@@ -45,7 +45,7 @@ ln -s bin $INITRAMFS/sbin
 
 copy_including_deps /bin/busybox || cp static/busybox $INITRAMFS/bin
 
-$INITRAMFS/bin/busybox | grep , | grep -v Copyright | tr "," " " | while read LINE; do
+for LINE in $($INITRAMFS/bin/busybox | grep , | grep -v Copyright | tr "," " "); do
    for TOOL in $LINE; do
       if [ ! -e $INITRAMFS/bin/$TOOL ]; then
          ln -s busybox $INITRAMFS/bin/$TOOL
@@ -63,7 +63,7 @@ mknod $INITRAMFS/dev/tty3 c 4 3
 mknod $INITRAMFS/dev/tty4 c 4 4
 
 copy_including_deps /$LMK/kernel/fs
-find /$LMK/kernel/ | grep crc32c | while read LINE; do
+for LINE in $(find /$LMK/kernel/ | grep crc32c); do
    copy_including_deps $LINE
 done
 copy_including_deps /$LMK/kernel/drivers/staging/zsmalloc # needed by zram
