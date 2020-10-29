@@ -25,7 +25,6 @@ mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM} ${WORK}
 
 persistent_changes()
 {	
-	mkdir -p "$2"
 	if grep -vq perch /proc/cmdline; then
 		return
 	fi
