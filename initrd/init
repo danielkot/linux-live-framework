@@ -32,14 +32,14 @@ persistent_changes()
 	CHANGES1="${DATAMNT}/changes"
 	T1="$CHANGES1/.empty"
 	T2="$T1"2
-	touch "$T1" 2>/dev/null && rm -f "$T1" ${null}
+	touch "$T1" ${null} && rm -f "$T1" ${null}
 	if [ $? -ne 0 ]; then
 		return
 	fi
-	touch "$T1" && ln -sf "$T1" "$T2" 2>/dev/null && \
-	chmod +x "$T1" 2>/dev/null && test -x "$T1" && \
-	chmod -x "$T1" 2>/dev/null && test ! -x "$T1" && \
-	rm "$T1" "$T2" 2>/dev/null
+	touch "$T1" && ln -sf "$T1" "$T2" ${null} && \
+	chmod +x "$T1" ${null} && test -x "$T1" && \
+	chmod -x "$T1" ${null} && test ! -x "$T1" && \
+	rm "$T1" "$T2" ${null}
 	if [ $? -eq 0 ]; then
 		mount --bind "$CHANGES1" "$2"
 		return
@@ -113,8 +113,8 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 		umount -f ${DATAMNT} ${null}
 	fi
 done
-persistent_changes ${SYSTEM} ${CHANGES}
-mount -t overlay -o workdir=${WORK},upperdir=${CHANGES},lowerdir=${SYSTEM} overlay ${UNION}
+persistent_changes ${SYSTEM} ${CHANGES} ${null}
+mount -t overlay -o workdir=${WORK},upperdir=${CHANGES},lowerdir=${SYSTEM} overlay ${UNION} ${null}
 debug_shell
 echo "Starting ${DISTRO}"
 sleep 2
