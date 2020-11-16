@@ -26,7 +26,7 @@ copy_including_deps()
         copy_including_deps "$LIB"
      done
 
-   for MOD in $(find "$1" -type f -name "*.ko"); do
+   for MOD in $(find "$1" -type f | grep .ko); do
       for DEP in $(fgrep /$(basename $MOD /$LMK/modules.dep):); do
          copy_including_deps "/$LMK/$DEP"
       done
