@@ -102,15 +102,15 @@ mdadm --assemble --scan ${null}
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	echo -n "."
-	mount ${i} ${DATAMNT}
+	mount ${i} ${DATAMNT} ${null}
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo -n " Found ${DISTRO} on ${i}"
-		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
+		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM} ${null}
 		sleep 1.5
 		break
 	else
-		umount -f ${DATAMNT}
+		umount -f ${DATAMNT} ${null}
 	fi
 done
 persistent_changes ${SYSTEM} ${CHANGES}
