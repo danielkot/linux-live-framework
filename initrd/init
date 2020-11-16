@@ -32,7 +32,7 @@ persistent_changes()
 	CHANGES1="${DATAMNT}/changes"
 	T1="$CHANGES1/.empty"
 	T2="$T1"2
-	touch "$T1" 2>/dev/null && rm -f "$T1" 2>/dev/null
+	touch "$T1" 2>/dev/null && rm -f "$T1" ${null}
 	if [ $? -ne 0 ]; then
 		return
 	fi
@@ -49,11 +49,11 @@ persistent_changes()
 	fi
 	mount.dynfilefs "$CHANGES1/changes.dat" 4000 "$2"
 	if [ ! "$EXISTS" ]; then
-		mke2fs -F "$2/loop.fs" >/dev/null 2>&1
+		mke2fs -F "$2/loop.fs" ${null}
 	fi
 	mount -o loop,sync "$2/loop.fs" "$2"
-	rm "$T1" "$T2" 2>/dev/null
-	rmdir "$2/lost+found" 2>/dev/null
+	rm -f "$T1" "$T2" ${null}
+	rmdir "$2/lost+found" ${null}
 }
 debug_shell()
 {
@@ -84,26 +84,30 @@ mount -t sysfs sysfs /sys
 if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
+else
+	null=">/dev/null 2>/dev/null"
 fi
 debug_shell
 ln -sf /proc/mounts /etc/mtab
-find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe 2>/dev/null
+find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe ${null}
 sleep 3
 mdev -s
 if [ -e /sys/block/zram0/disksize ]; then
-	echo 536870912 >/sys/block/zram0/disksize # 512MB
-	mkswap /dev/zram0 >/dev/null
+	echo 536870912 >/sys/block/zram0/disksize
+	mkswap /dev/zram0 ${null}
 	swapon /dev/zram0
 	echo 100 >/proc/sys/vm/swappiness
 fi
-mdadm --assemble --scan
+mdadm --assemble --scan ${null}
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
+	echo -n "."
 	mount ${i} ${DATAMNT}
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
+		echo -n " Found ${DISTRO} on ${i}"
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
-		sleep 1
+		sleep 1.5
 		break
 	else
 		umount -f ${DATAMNT}
@@ -112,7 +116,7 @@ done
 persistent_changes ${SYSTEM} ${CHANGES}
 mount -t overlay -o workdir=${WORK},upperdir=${CHANGES},lowerdir=${SYSTEM} overlay ${UNION}
 debug_shell
-echo "Starting $DISTRO"
+echo "Starting ${DISTRO}"
 sleep 2
 change_root "$UNION" || clear; echo "!!ERROR occured, you shouldn't be here.!!"; sleep 3
 while :; do
