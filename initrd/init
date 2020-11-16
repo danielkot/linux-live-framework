@@ -78,8 +78,6 @@ change_root()
 	exec chroot . init
 }
 
-
-debug_shell
 mount -t proc proc /proc
 echo "0" >/proc/sys/kernel/printk
 mount -t sysfs sysfs /sys
@@ -87,6 +85,7 @@ if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
 fi
+debug_shell
 ln -sf /proc/mounts /etc/mtab
 find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe 2>/dev/null
 sleep 3
