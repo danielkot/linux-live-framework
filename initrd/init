@@ -2,6 +2,12 @@
 
 export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
 export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
+MEMORY=/memory
+CHANGES=$MEMORY/changes
+UNION=$MEMORY/union
+DATAMNT=$MEMORY/data
+SYSTEM=$MEMORY/system
+WORK=$MEMORY/work
 
 . /lib/.config
 
@@ -14,14 +20,6 @@ if [ ! -e /lib/initramfs_escaped ]; then
 	touch $SWITCH/lib/initramfs_escaped
 	exec switch_root . $0
 fi
-
-MEMORY=/memory
-CHANGES=$MEMORY/changes
-UNION=$MEMORY/union
-DATAMNT=$MEMORY/data
-SYSTEM=$MEMORY/system
-WORK=$MEMORY/work
-mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM} ${WORK}
 
 persistent_changes()
 {	
@@ -78,6 +76,7 @@ change_root()
 	exec chroot . init
 }
 
+mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM} ${WORK}
 mount -t proc proc /proc
 echo "0" >/proc/sys/kernel/printk
 mount -t sysfs sysfs /sys
@@ -91,21 +90,21 @@ debug_shell
 ln -sf /proc/mounts /etc/mtab
 find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe ${null}
 sleep 3
-mdev -s
+mdev -s ${null}
 if [ -e /sys/block/zram0/disksize ]; then
 	echo 536870912 >/sys/block/zram0/disksize
 	mkswap /dev/zram0 ${null}
-	swapon /dev/zram0
+	swapon /dev/zram0 ${null}
 	echo 100 >/proc/sys/vm/swappiness
 fi
 mdadm --assemble --scan ${null}
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
-	echo -n "."
+	echo "Searching ${DISTRO} on ${i} ..."
 	mount ${i} ${DATAMNT} ${null}
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
-		echo -n " Found ${DISTRO} on ${i}"
+		echo "Found ${DISTRO} on ${i}"
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM} ${null}
 		sleep 1.5
 		break
