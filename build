@@ -23,8 +23,7 @@ for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\" -o -name \"bzImag
 		echo "-----"
 		read kernel
 		kernel="${list[${kernel}]}"
-		unset list
-		unset n
+		unset list n
 		break
 	else
 		kernel="${i}"
@@ -64,12 +63,13 @@ if ! mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz; then
 fi
 mv -f ${INITRD} ${BOOT}/initrfs.img
 cp -f bootfiles/* ${BOOT}
+cp -f copyroot/tmp/grub_efi.img ${DATA}/efi.img
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/syslinux.cfg
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/boot/grub/grub.cfg
 cp -f ${KERNEL} ${BOOT}/vmlinuz
 cd ${DATA}
 timedate="`date +"%d-%m-%Y"`"
-${IMAGER} -o /${DISTRO}-${timedate}.iso -J -R -D -A ${DISTRO} -V ${DISTRO} -no-emul-boot -boot-info-table -boot-load-size 4 -b isolinux.bin -c isolinux.boot -eltorito-alt-boot -no-emul-boot -e /tmp/grub_efi.img .
+${IMAGER} -o /${DISTRO}-${timedate}.iso -J -R -D -A ${DISTRO} -V ${DISTRO} -no-emul-boot -boot-info-table -boot-load-size 4 -b isolinux.bin -c isolinux.boot -eltorito-alt-boot -no-emul-boot -e ${DATA}/efi.img .
 command -v isohybrid >/dev/null && isohybrid --uefi /${DISTRO}-${timedate}.iso
 cd ${top}
 rm -rf ${temp_root} ${DATA}
