@@ -63,7 +63,7 @@ if ! mksquashfs ${temp_root}/rootfs ${DATA}/${DISTRO}/system.sfs -comp xz; then
 fi
 mv -f ${INITRD} ${BOOT}/initrfs.img
 cp -f bootfiles/* ${BOOT}
-cp -f copyroot/tmp/grub_efi.img ${DATA}/efi.img
+mv -f ${temp_root}/rootfs/tmp/grub_efi.img ${DATA}/efi.img
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/syslinux.cfg
 sed -i -r "s/__DISTRO__/${DISTRO}/" ${BOOT}/boot/grub/grub.cfg
 cp -f ${KERNEL} ${BOOT}/vmlinuz
