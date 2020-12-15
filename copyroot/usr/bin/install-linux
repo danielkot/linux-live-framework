@@ -4,9 +4,12 @@
 #   BY: Daniel K. aka *DANiO*
 
 for i in dialog fdisk cfdisk sed grep mke2fs grub-install; do
-	[ ! -x `command -v ${i}` ] && echo "Please install ${i}" && fail="true"
+	if [ ! -x `command -v ${i}` ]; then
+		req_app+="${i} "
+		fail="true"
+	fi
 done
-[ ${fail}="true" ] && echo "Please install above apps to run this installer" && exit 1
+[ ${fail} ] && echo "Please install \"${req_app}\" to run this installer" && exit 1
 
 dialog --clear --title "GENERAL INFORMATION" --msgbox "Generic installer is a gui-based tool to install your running Linux to your harddisk.\n\n You are able to partition and format your harddisk and install in the end a bootloader.\n\n You will use this installer at your own risk. I am not responsible for lost of datas or something else.\n\n If you accept this, you can start now! Or you may cancel the installer!" 20 70
 if [ $? = 1 ] ; then
