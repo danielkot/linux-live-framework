@@ -57,6 +57,7 @@ persistent_changes()
 debug_shell()
 {
 	if [ "$DEBUG_IS_ENABLED" ]; then
+		echo -e "Debug shell activated!\nControl+D or 'exit' to contiunue boot.\n"
 		setsid sh -c 'exec sh </dev/tty1 >/dev/tty1 2>&1'
 	fi
 }
@@ -85,7 +86,7 @@ if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
 else
-	null=">/dev/null 2>/dev/null"
+	null=">/dev/null 2>&1"
 fi
 debug_shell
 ln -sf /proc/mounts /etc/mtab
@@ -113,7 +114,9 @@ for i in `blkid -o device | sort | grep -vE "loop|zram|ram"`; do
 		umount -f ${DATAMNT} ${null}
 	fi
 done
+debug_shell
 persistent_changes ${SYSTEM} ${CHANGES} ${null}
+debug_shell
 if [ "${NOCHANGE}" == "" ]; then
 	WORK="${DATAMNT}/work"
 	CHANGES="${DATAMNT}/changes"
