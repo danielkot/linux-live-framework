@@ -24,6 +24,7 @@ fi
 persistent_changes()
 {	
 	if grep -vq perch /proc/cmdline; then
+		NOCHANGE="true"
 		return
 	fi
 	mkdir -p ${DATAMNT}/changes
@@ -99,7 +100,7 @@ if [ -e /sys/block/zram0/disksize ]; then
 fi
 mdadm --assemble --scan ${null}
 debug_shell
-for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
+for i in `blkid -o device | sort | grep -vE "loop|zram|ram"`; do
 	echo "Searching ${DISTRO} on ${i} ..."
 	mount ${i} ${DATAMNT} ${null}
 	sleep 1
@@ -113,6 +114,11 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	fi
 done
 persistent_changes ${SYSTEM} ${CHANGES} ${null}
+if [ "${NOCHANGE}" == "" ]; then
+	WORK="${DATAMNT}/work"
+	CHANGES="${DATAMNT}/changes"
+	mkdir -p ${WORK} ${CHANGES}
+ fi
 mount -t overlay -o workdir=${WORK},upperdir=${CHANGES},lowerdir=${SYSTEM} overlay ${UNION} ${null}
 debug_shell
 echo "Starting ${DISTRO}"
