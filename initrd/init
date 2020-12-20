@@ -24,7 +24,6 @@ fi
 persistent_changes()
 {	
 	if grep -vq perch /proc/cmdline; then
-		NOCHANGE="true"
 		return
 	fi
 	mkdir -p ${DATAMNT}/changes
@@ -117,11 +116,6 @@ done
 debug_shell
 persistent_changes ${SYSTEM} ${CHANGES} ${null}
 debug_shell
-if [ "${NOCHANGE}" == "" ]; then
-	WORK="${DATAMNT}/work"
-	CHANGES="${DATAMNT}/changes"
-	mkdir -p ${WORK} ${CHANGES}
- fi
 mount -t overlay -o workdir=${WORK},upperdir=${CHANGES},lowerdir=${SYSTEM} overlay ${UNION} ${null}
 debug_shell
 echo "Starting ${DISTRO}"
