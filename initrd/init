@@ -100,7 +100,7 @@ if [ -e /sys/block/zram0/disksize ]; then
 fi
 mdadm --assemble --scan ${null}
 debug_shell
-for i in `blkid -o device | sort | grep -vE "loop|zram|ram"`; do
+for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	echo "Searching ${DISTRO} on ${i} ..."
 	mount ${i} ${DATAMNT} ${null}
 	sleep 1
