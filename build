@@ -10,6 +10,7 @@ for i in mksquashfs cpio gzip sed grep; do
 	fi
 done
 
+cd "$(dirname $(readlink -f $0))"
 cp -f config .config
 for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\" -o -name \"bzImage\"`"; do
 	if [ `echo ${i} | wc -l` != 1 ]; then
