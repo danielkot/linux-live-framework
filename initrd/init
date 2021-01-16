@@ -17,7 +17,7 @@ if [ ! -e /lib/initramfs_escaped ]; then
 	mount -t tmpfs -o size="100%" tmpfs ${SWITCH}
 	cp -a /??* ${SWITCH} 2>/dev/null
 	cd ${SWITCH}
-	touch $SWITCH/lib/initramfs_escaped
+	touch lib/initramfs_escaped
 	exec switch_root . $0
 fi
 
