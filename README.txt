@@ -45,8 +45,8 @@ Note:
 			- cd to d:\,
 			- Run in cmd `bootinst.bat`,
 			- Now you can reboot your device to your linux distro.
-	* The iso and frugal mode uses legacy MBR bootloader!
-		- No UEFI at this time!
+	* The iso image uses legacy MBR bootloader and UEFI.
+		- The `install-linux` uses legacy MBR bootloader at this time!
 	* You should be chrooted to linux distro.
 	* You should not be run that tool on *YOUR* **REAL** running linux.
 	* The final iso image will be in your root device (means /) (If you ran this tool in *YOUR* **REAL** running linux) or in your chrooted linux distro (means /path/to/chroot/folder).
