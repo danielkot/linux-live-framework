@@ -8,6 +8,7 @@ UNION=$MEMORY/union
 DATAMNT=$MEMORY/data
 SYSTEM=$MEMORY/system
 WORK=$MEMORY/work
+RAM=$MEMORY/ram
 
 . /lib/.config
 
@@ -77,7 +78,7 @@ change_root()
 	exec chroot . init
 }
 
-mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM} ${WORK}
+mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM} ${WORK} ${RAM}
 mount -t proc proc /proc
 echo "0" >/proc/sys/kernel/printk
 mount -t sysfs sysfs /sys
@@ -106,11 +107,16 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	sleep 1
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} on ${i}"
+		if grep -q toram /proc/cmdline; then
+			cp -raf ${DATAMNT}/* ${RAM} ${null}
+			umount -f ${DATAMNT} ${null}
+			mv -f ${RAM}/* ${DATAMNT} ${null}
+		fi
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM} ${null}
 		sleep 1.5
 		break
 	else
-		umount -f ${DATAMNT} ${null}
+		umount -f ${DATAMNT} ${null} ${null}
 	fi
 done
 debug_shell
