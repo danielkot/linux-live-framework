@@ -116,7 +116,7 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 		sleep 1.5
 		break
 	else
-		umount -f ${DATAMNT} ${null} ${null}
+		umount -f ${DATAMNT} ${null}
 	fi
 done
 debug_shell
