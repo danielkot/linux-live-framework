@@ -100,11 +100,12 @@ if [ -e /sys/block/zram0/disksize ]; then
 	echo 100 >/proc/sys/vm/swappiness
 fi
 mdadm --assemble --scan ${null}
+sleep 0.5
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	echo "Searching ${DISTRO} on ${i} ..."
 	mount ${i} ${DATAMNT} ${null}
-	sleep 1
+	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} on ${i}"
 		if grep -q toram /proc/cmdline; then
@@ -113,7 +114,7 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 			mv -f ${RAM}/* ${DATAMNT} ${null}
 		fi
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM} ${null}
-		sleep 1.5
+		sleep 0.5
 		break
 	else
 		umount -f ${DATAMNT} ${null}
