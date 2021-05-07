@@ -34,7 +34,8 @@ persistent_changes()
 		sleep 5
 		return
 	fi
-	local T1 T2 EXISTS
+	local CHANGES T1 T2 EXISTS
+	CHANGES=$DATAMNT/changes
 	T1="$CHANGES/.empty"
 	T2="$T1"2
 	mkdir -p "$2"
