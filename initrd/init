@@ -3,9 +3,8 @@
 export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
 export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
 MEMORY=/memory
-CHANGES1=$MEMORY/changes
-CHANGES=$CHANGES1/changes
-WORK=$CHANGES1/work
+CHANGES=$MEMORY/changes/changes
+WORK=$MEMORY/work
 UNION=$MEMORY/union
 DATAMNT=$MEMORY/data
 SYSTEM=$MEMORY/system
@@ -102,7 +101,7 @@ fi
 debug_shell
 ln -sf /proc/mounts /etc/mtab
 find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe ${null}
-sleep 1.5
+sleep 3
 if [ -r /proc/sys/kernel/hotplug ]; then
 	command -v mdev >/proc/sys/kernel/hotplug
 fi
