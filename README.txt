@@ -44,7 +44,8 @@ Note:
 			- Open cmd as admin,
 			- cd to d:\,
 			- Run in cmd `bootinst.bat`,
-			- Now you can reboot your device to your linux distro.
+			- Now you can reboot your device to your linux distro,
+		- OR Use rufus to write image to pendrive.
 	* The iso image uses legacy MBR bootloader and UEFI.
 		- The `install-linux` uses legacy MBR bootloader at this time!
 	* You should be chrooted to linux distro.
