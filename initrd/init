@@ -3,11 +3,12 @@
 export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
 export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
 MEMORY=/memory
-CHANGES=$MEMORY/changes
+CHANGES1=$MEMORY/changes
+CHANGES=$CHANGES1/changes
+WORK=$CHANGES1/work
 UNION=$MEMORY/union
 DATAMNT=$MEMORY/data
 SYSTEM=$MEMORY/system
-WORK=$MEMORY/work
 RAM=$MEMORY/ram
 
 . /lib/.config
@@ -23,36 +24,45 @@ if [ ! -e /lib/initramfs_escaped ]; then
 fi
 
 persistent_changes()
-{	
-	if grep -vq perch /proc/cmdline; then
+{
+	if ! grep -q perch /proc/cmdline; then
 		return
 	fi
-	mkdir -p ${DATAMNT}/changes
-	CHANGES1="${DATAMNT}/changes"
-	T1="$CHANGES1/.empty"
+	if grep -q toram /proc/cmdline; then
+		echo "'perch' and 'toram' can't be used at the same time!"
+		echo "Continuing in 5 seconds."
+		sleep 5
+		return
+	fi
+	local T1 T2 EXISTS
+	T1="$CHANGES/.empty"
 	T2="$T1"2
-	touch "$T1" ${null} && rm -f "$T1" ${null}
+	mkdir -p "$2"
+	touch "$T1" 2>/dev/null && rm -f "$T1" 2>/dev/null
 	if [ $? -ne 0 ]; then
 		return
 	fi
-	touch "$T1" && ln -sf "$T1" "$T2" ${null} && \
-	chmod +x "$T1" ${null} && test -x "$T1" && \
-	chmod -x "$T1" ${null} && test ! -x "$T1" && \
-	rm "$T1" "$T2" ${null}
+	echo "Testing persistent changes for posix compatibility"
+	touch "$T1" && ln -sf "$T1" "$T2" 2>/dev/null && \
+	chmod +x "$T1" 2>/dev/null && test -x "$T1" && \
+	chmod -x "$T1" 2>/dev/null && test ! -x "$T1" && \
+	rm "$T1" "$T2" 2>/dev/null
 	if [ $? -eq 0 ]; then
-		mount --bind "$CHANGES1" "$2"
+		echo "Activating native persistent changes"
+		mount --bind "$CHANGES" "$2"
 		return
 	fi
-	if [ -e "$CHANGES1/changes.dat" ]; then
+	if [ -e "$CHANGES/changes.dat" ]; then
+		echo "Restoring persistent changes"
 		EXISTS="true"
 	fi
-	mount.dynfilefs "$CHANGES1/changes.dat" 4000 "$2"
+	mount.dynfilefs "$CHANGES/changes.dat" 4000 "$2"
 	if [ ! "$EXISTS" ]; then
-		mke2fs -F "$2/loop.fs" ${null}
+		mke2fs -F "$2/loop.fs" >/dev/null 2>&1
 	fi
 	mount -o loop,sync "$2/loop.fs" "$2"
-	rm -f "$T1" "$T2" ${null}
-	rmdir "$2/lost+found" ${null}
+	rm "$T1" "$T2" 2>/dev/null
+	rmdir "$2/lost+found" 2>/dev/null
 }
 debug_shell()
 {
@@ -91,7 +101,10 @@ fi
 debug_shell
 ln -sf /proc/mounts /etc/mtab
 find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe ${null}
-sleep 3
+sleep 1.5
+if [ -r /proc/sys/kernel/hotplug ]; then
+	command -v mdev >/proc/sys/kernel/hotplug
+fi
 mdev -s ${null}
 if [ -e /sys/block/zram0/disksize ]; then
 	echo 536870912 >/sys/block/zram0/disksize
