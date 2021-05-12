@@ -16,7 +16,7 @@ cp -f config .config
 list=(`ls -A /boot | grep -E "bzImage|*kernel*|vmlinuz-*"`)
 if [ `echo ${list} | wc -l`!=1 ]; then
         n=0
-        echo -e "There are too many kernels\nPlease choose your kernel to proceed:\nPlease choose number from ${n} to ${#list[@]}\n-----\n"
+        echo -e "TPlease choose your kernel to proceed:\nChoose number from ${n} to ${#list[@]}\n-----\n"
         for a in ${list[@]}; do
                 echo "[${n}] - ${a}"
                 ((n++))
