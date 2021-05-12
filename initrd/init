@@ -2,13 +2,14 @@
 
 export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
 export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
-MEMORY=/memory
-CHANGES=$MEMORY/changes/changes
-WORK=$MEMORY/work
-UNION=$MEMORY/union
-DATAMNT=$MEMORY/data
-SYSTEM=$MEMORY/system
-RAM=$MEMORY/ram
+export MEMORY=/memory
+export CHANGES_MNT=/memory/changes
+export CHANGES=${CHANGES_MNT}/changes
+export WORK=${CHANGES_MNT}/work
+export UNION=${MEMORY}/union
+export DATAMNT=${MEMORY}/data
+export SYSTEM=${MEMORY}/system
+export RAM=${MEMORY}/ram
 
 . /lib/.config
 
@@ -25,12 +26,6 @@ fi
 persistent_changes()
 {
 	if ! grep -q perch /proc/cmdline; then
-		return
-	fi
-	if grep -q toram /proc/cmdline; then
-		echo "'perch' and 'toram' can't be used at the same time!"
-		echo "Continuing in 5 seconds."
-		sleep 5
 		return
 	fi
 	local CHANGES T1 T2 EXISTS
@@ -88,7 +83,7 @@ change_root()
 	exec chroot . init
 }
 
-mkdir -p ${CHANGES} ${UNION} ${DATAMNT} ${SYSTEM} ${WORK} ${RAM}
+mkdir -p ${UNION} ${DATAMNT} ${SYSTEM} ${RAM}
 mount -t proc proc /proc
 echo "0" >/proc/sys/kernel/printk
 mount -t sysfs sysfs /sys
@@ -121,12 +116,6 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} on ${i}"
-		if grep -q toram /proc/cmdline; then
-			echo "Copying to RAM ..."
-			cp -raf ${DATAMNT}/* ${RAM} ${null}
-			umount -f ${DATAMNT} ${null}
-			mv -f ${RAM}/* ${DATAMNT} ${null}
-		fi
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM} ${null}
 		sleep 0.5
 		break
@@ -135,9 +124,10 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	fi
 done
 debug_shell
-persistent_changes ${SYSTEM} ${CHANGES} ${null}
+persistent_changes ${SYSTEM} ${CHANGES_MNT} ${null}
+mkdir -p ${CHANGES} ${WORK}
 debug_shell
-mount -t overlay -o workdir=${WORK},upperdir=${CHANGES},lowerdir=${SYSTEM} overlay ${UNION} ${null}
+mount -t overlay -o lowerdir=${SYSTEM},upperdir=${CHANGES},workdir=${WORK} overlay ${UNION} ${null}
 debug_shell
 echo "Starting ${DISTRO}"
 sleep 2
