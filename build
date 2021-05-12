@@ -12,24 +12,23 @@ done
 
 cd "$(dirname $(readlink -f ${0}))"
 cp -f config .config
-for i in "`find /boot -name \"vmlinuz*\" -o -name \"*kernel*\" -o -name \"bzImage\"`"; do
-	if [ `echo ${i} | wc -l` != 1 ]; then
-		list=("${i}")
-		n=0
-		echo -e "There are too many kernels\nPlease choose your kernel to proceed:\nPlease choose number from ${n} to ${#list[@]}\n-----\n"
-		for a in ${list[@]}; do
-			echo "[${n}] - ${a}"
-			n+=1
-		done
-		echo "-----"
-		read kernel
-		kernel="${list[${kernel}]}"
-		unset list n
-		break
-	else
-		kernel="${i}"
-	fi
-done
+
+list=(`find /boot -name "vmlinuz*" -o -name "*kernel*" -o -name "bzImage"`)
+[ `echo ${i} | wc -l`!=1 ] && many_kernels="true"
+if [ ${many_kernels} ]; then
+	n=0
+	echo -e "There are too many kernels\nPlease choose your kernel to proceed:\nPlease choose number from ${n} to ${#list[@]}\n-----\n"
+	for a in ${list[@]}; do
+		echo "[${n}] - ${a}"
+		((n++))
+	done
+	echo "-----"
+	read kernel
+	kernel="${list[${kernel}]}"
+	unset list n
+else
+	kernel="${list[0]}"
+fi
 echo "KERNEL=\"${kernel}\"" >>.config
 echo "LMK=\"/lib/modules/`file -bL ${kernel} | grep -o 'version [^ ]*' | cut -d ' ' -f 2`\"" >>.config
 unset kernel
