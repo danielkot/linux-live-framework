@@ -23,10 +23,11 @@ if [ `echo ${list} | wc -l`!=1 ]; then
         done
         echo "-----"
         read kernel
-        kernel="${list[${kernel}]}"
+        kernel="`readlink -f ${list[${kernel}]}`"
         unset list n
 else
-        kernel="${list[0]}"
+        kernel="`readlink -f ${list[0]}`"
+fi
 fi
 echo "KERNEL=\"${kernel}\"" >>.config
 echo "LMK=\"/lib/modules/`file -bL ${kernel} | grep -o 'version [^ ]*' | cut -d ' ' -f 2`\"" >>.config
