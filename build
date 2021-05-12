@@ -14,7 +14,7 @@ cd "$(dirname $(readlink -f ${0}))"
 cp -f config .config
 
 list=(`find /boot -name "vmlinuz*" -o -name "*kernel*" -o -name "bzImage"`)
-[ `echo ${i} | wc -l`!=1 ] && many_kernels="true"
+[ `echo ${lists} | wc -l`!=1 ] && many_kernels="true"
 if [ ${many_kernels} ]; then
 	n=0
 	echo -e "There are too many kernels\nPlease choose your kernel to proceed:\nPlease choose number from ${n} to ${#list[@]}\n-----\n"
