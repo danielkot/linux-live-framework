@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
-# Script for install Generic Linux to hdd
+# installation-help for Slax
+# 22.05.2007
+# shell script for installation of SLAX to harddisk
+# written by Thomas Schoenhuetl <pilleus.pulcher@arcor.de> 22.05.2007
+# It contains parts of the official Slackware installer.
+# This shell script is contributed under the terms of GPL v2 by Thomas Schoenhuetl <pilleus.pulcher@arcor.de> 22.05.2007.
+
+# Modified script "slax2hd" for installing Generic Linux to hdd
 #   BY: Daniel K. aka *DANiO*
 
 for i in dialog fdisk cfdisk sed grep mke2fs grub-install; do
