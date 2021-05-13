@@ -28,6 +28,12 @@ persistent_changes()
 	if ! grep -q perch /proc/cmdline; then
 		return
 	fi
+	if [ `grep -c toram /proc/cmdline` = 1 -a `grep -c perch /proc/cmdline` = 1 ]; then
+		echo "'perch' and 'toram' can't be used at the same time!"
+		echo "Continuing in 5 seconds."
+		sleep 5
+		return
+	fi
 	local CHANGES T1 T2 EXISTS
 	CHANGES=$DATAMNT/changes
 	T1="$CHANGES/.empty"
@@ -90,44 +96,48 @@ mount -t sysfs sysfs /sys
 if grep -q debug /proc/cmdline; then
 	DEBUG_IS_ENABLED=1
 	set -x
-else
-	null=">/dev/null 2>&1"
 fi
 debug_shell
 ln -sf /proc/mounts /etc/mtab
-find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe ${null}
+find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe
 sleep 3
 if [ -r /proc/sys/kernel/hotplug ]; then
 	command -v mdev >/proc/sys/kernel/hotplug
 fi
-mdev -s ${null}
+mdev -s
 if [ -e /sys/block/zram0/disksize ]; then
 	echo 536870912 >/sys/block/zram0/disksize
-	mkswap /dev/zram0 ${null}
-	swapon /dev/zram0 ${null}
+	mkswap /dev/zram0
+	swapon /dev/zram0
 	echo 100 >/proc/sys/vm/swappiness
 fi
-mdadm --assemble --scan ${null}
+mdadm --assemble --scan
 sleep 0.5
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	echo "Searching ${DISTRO} on ${i} ..."
-	mount ${i} ${DATAMNT} ${null}
+	mount ${i} ${DATAMNT}
 	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} on ${i}"
-		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM} ${null}
+		if grep -q toram /proc/cmdline; then
+			echo "Copying to RAM ..."
+			cp -raf ${DATAMNT}/* ${RAM}
+			umount -f ${DATAMNT}
+			mv -f ${RAM}/* ${DATAMNT}
+		fi
+		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
 		sleep 0.5
 		break
 	else
-		umount -f ${DATAMNT} ${null}
+		umount -f ${DATAMNT}
 	fi
 done
 debug_shell
-persistent_changes ${SYSTEM} ${CHANGES_MNT} ${null}
+persistent_changes ${SYSTEM} ${CHANGES_MNT}
 mkdir -p ${CHANGES} ${WORK}
 debug_shell
-mount -t overlay -o lowerdir=${SYSTEM},upperdir=${CHANGES},workdir=${WORK} overlay ${UNION} ${null}
+mount -t overlay -o lowerdir=${SYSTEM},upperdir=${CHANGES},workdir=${WORK} overlay ${UNION}
 debug_shell
 echo "Starting ${DISTRO}"
 sleep 2
