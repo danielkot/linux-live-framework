@@ -1,0 +1,4 @@
+Authors:
+	- Daniel K. (https://github.com/danielkot)
+Credits:
+	- Tomas M. (https://github.com/Tomas-M)
