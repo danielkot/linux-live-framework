@@ -113,13 +113,7 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	mount ${i} ${DATAMNT}
 	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
-		echo "Found ${DISTRO} on ${i}"
-		if grep -q toram /proc/cmdline; then
-			echo "Copying to RAM ..."
-			cp -raf ${DATAMNT}/* ${RAM}
-			umount -f ${DATAMNT}
-			mv -f ${RAM}/* ${DATAMNT}
-		fi
+		echo "Found ${DISTRO} in ${i}"
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
 		sleep 0.5
 		break
