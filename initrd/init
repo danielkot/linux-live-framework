@@ -98,6 +98,7 @@ if [ -r /proc/sys/kernel/hotplug ]; then
 	command -v mdev >/proc/sys/kernel/hotplug
 fi
 mdev -s
+debug_shell
 if [ -e /sys/block/zram0/disksize ]; then
 	echo 536870912 >/sys/block/zram0/disksize
 	mkswap /dev/zram0
