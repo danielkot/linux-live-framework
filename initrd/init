@@ -9,7 +9,6 @@ export WORK=${CHANGES_MNT}/work
 export UNION=${MEMORY}/union
 export DATAMNT=${MEMORY}/data
 export SYSTEM=${MEMORY}/system
-export RAM=${MEMORY}/ram
 
 . /lib/.config
 
