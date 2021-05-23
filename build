@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 IMAGER="`command -v mkisofs`"
-[ "${IMAGER}" = "" ] && IMAGER="`command -v genisoimage`"
-[ "${IMAGER}" = "" ] && echo "Can not found mkisofs or genisoimage" && exit 1
+[ -z "${IMAGER}" ] && IMAGER="`command -v genisoimage`"
+[ -z "${IMAGER}" ] && echo "Can not found mkisofs or genisoimage" && exit 1
 for i in mksquashfs cpio gzip sed grep; do
 	if [ ! -x `command -v ${i}` ]; then
 		echo "Please install ${i} app to run this tool"
