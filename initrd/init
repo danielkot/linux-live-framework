@@ -3,7 +3,7 @@
 export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
 export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
 export MEMORY=/memory
-export CHANGES_MNT=/memory/changes
+export CHANGES_MNT=${MEMORY}/changes
 export CHANGES=${CHANGES_MNT}/changes
 export WORK=${CHANGES_MNT}/work
 export UNION=${MEMORY}/union
