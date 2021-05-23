@@ -110,7 +110,7 @@ sleep 0.5
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	echo "Searching ${DISTRO} in ${i} ..."
-	mount ${i} ${DATAMNT}
+	mount ${i} ${DATAMNT} 2>/dev/null
 	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} in ${i}"
