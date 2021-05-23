@@ -105,7 +105,7 @@ if [ -e /sys/block/zram0/disksize ]; then
 	swapon /dev/zram0
 	echo 100 >/proc/sys/vm/swappiness
 fi
-[ -x `command -v mdadm` ] && mdadm --assemble --scan
+mdadm --assemble --scan
 sleep 0.5
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
