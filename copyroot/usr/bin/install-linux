@@ -236,7 +236,7 @@ mount --bind /dev /mnt/`cat $TMP/pout | cut -b 6-9`/dev
 mount --bind /proc /mnt/`cat $TMP/pout | cut -b 6-9`/proc
 mount --bind /sys /mnt/`cat $TMP/pout | cut -b 6-9`/sys
 
-grub-install --compress=xz --recheck --force --root-directory=/mnt/`cat $TMP/pout | cut -b 6-9` --recheck `cat $TMP/pout | cut -b 1-8`
+grub-install --recheck --force --root-directory=/mnt/`cat $TMP/pout | cut -b 6-9` `cat $TMP/pout | cut -b 1-8`
 if ! chroot /mnt/`cat $TMP/pout | cut -b 6-9` grub-mkconfig -o /boot/grub/grub.cfg; then
 	# if here is error then panic!
 	dialog --title "ERROR" --infobox "Can't generate grub.cfg file!\n---\nI'm panic!\n" 10 70
@@ -247,45 +247,33 @@ fi
 
 umount -f /mnt/`cat $TMP/pout | cut -b 6-9`/dev /mnt/`cat $TMP/pout | cut -b 6-9`/proc /mnt/`cat $TMP/pout | cut -b 6-9`/sys
 
-ask_for_hostname() {
-rm -rf /mnt/`cat $TMP/pout | cut -b 6-9`/etc/hostname
-clear
-echo "
-What is your hostname (computer name)?
-"
-read hostname
-if [ "$hostname" = "" ]; then
-clear
-echo "
-This hostname can not be empty
-"
-sleep 2
-ask_for_hostname
-fi
-echo "$hostname" > /mnt/`cat $TMP/pout | cut -b 6-9`/etc/hostname
-}
+rm -f /mnt/`cat $TMP/pout | cut -b 6-9`/etc/hostname
+while :; do
+	clear
+	echo "What is your hostname (computer name)?"
+	read hostname
+	if [ -z "$hostname" ]; then
+		clear
+		echo "This hostname can not be empty"
+		sleep 2
+	else
+		echo "$hostname" >/mnt/`cat $TMP/pout | cut -b 6-9`/etc/hostname
+		break
+	fi
+done
 
-echo "
-Installation completed!
---------------------------------
-"
+echo "Installation completed!
+--------------------------------"
 sleep 4
 
-finish() {
-clear
-echo "
-Would you like to reboot in to new system?
-[Y]es or [N]o ?
-"
-read choice
-case $choice in
-[Yy][Ee][Ss]|[Yy]) reboot ;;
-[Nn][Oo]|[Nn]) exit ;;
-*) echo "Bad option '${choice}'"; sleep 2; finish ;;
-esac
-}
-
 rm -rf $TMP
-ask_for_hostname
-clear
-finish
+while :; do
+	clear
+	echo -e "Would you like to reboot in to new system?\n[Y]es or [N]o?\n"
+	read choice
+	case $choice in
+	[Yy][Ee][Ss]|[Yy]) reboot ;;
+	[Nn][Oo]|[Nn]) exit ;;
+	*) echo "Bad option '${choice}'"; sleep 2 ;;
+	esac
+done
