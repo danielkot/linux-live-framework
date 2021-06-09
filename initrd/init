@@ -94,9 +94,6 @@ debug_shell
 ln -sf /proc/mounts /etc/mtab
 find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe
 sleep 3
-if [ -r /proc/sys/kernel/hotplug ]; then
-	command -v mdev >/proc/sys/kernel/hotplug
-fi
 mdev -s
 debug_shell
 if [ -e /sys/block/zram0/disksize ]; then
