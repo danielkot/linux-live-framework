@@ -92,7 +92,7 @@ if grep -q debug /proc/cmdline; then
 fi
 debug_shell
 ln -sf /proc/mounts /etc/mtab
-find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe
+find /lib/modules/`uname -r` -name "*.ko" | sed -r "s:^.*/|[.]ko\$::g" | xargs -n 1 modprobe 2>/dev/null
 sleep 3
 mdev -s
 debug_shell
