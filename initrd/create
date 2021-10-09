@@ -97,6 +97,10 @@ copy_including_deps /$LMK/modules.*
 
 cp static/mount.dynfilefs $INITRAMFS/bin
 copy_including_deps /sbin/blkid || cp static/blkid $INITRAMFS/bin
+copy_including_deps /usr/sbin/e2fsck || cp static/e2fsck $INITRAMFS/bin
+copy_including_deps /usr/sbin/fsck.fat || cp static/fsck.fat $INITRAMFS/bin
+copy_including_deps /usr/sbin/fsck.f2fs || cp static/fsck.f2fs $INITRAMFS/bin
+cp static/fsck $INITRAMFS/bin
 copy_including_deps /sbin/mdadm || cp static/mdadm $INITRAMFS/bin
 copy_including_deps /sbin/mount.ntfs-3g || cp static/mount.ntfs-3g $INITRAMFS/bin
 #copy_including_deps /usr/bin/eject || cp static/eject $INITRAMFS/bin
@@ -112,10 +116,9 @@ echo "root::0:0::/root:/bin/bash" >$INITRAMFS/etc/passwd
 touch $INITRAMFS/etc/{m,fs}tab
 
 cp init $INITRAMFS
-chmod a+x $INITRAMFS/init
 ln -s ../init $INITRAMFS/bin/init
 cp ../.config $INITRAMFS/lib
-chmod a+x $INITRAMFS/bin/*
+chmod a+x -R $INITRAMFS
 
 cd $INITRAMFS
 find . | cpio -o -H newc | gzip -cf9 >$INITRAMFS.img
