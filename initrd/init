@@ -54,6 +54,7 @@ persistent_changes()
 	if [ ! "$EXISTS" ]; then
 		mke2fs -F "$2/loop.fs" >/dev/null 2>&1
 	fi
+	grep -q fsck /proc/cmdline && fsck ${2}/loop.fs
 	mount -o loop,sync "$2/loop.fs" "$2"
 	rm "$T1" "$T2" 2>/dev/null
 	rmdir "$2/lost+found" 2>/dev/null
@@ -107,10 +108,12 @@ sleep 0.5
 debug_shell
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 	echo "Searching ${DISTRO} in ${i} ..."
-	mount ${i} ${DATAMNT} 2>/dev/null
+	mount -o ro ${i} ${DATAMNT} 2>/dev/null
 	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} in ${i}"
+		grep -q fsck /proc/cmdline && fsck ${i}
+		mount -o remount,rw ${DATAMNT}
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
 		sleep 0.5
 		break
