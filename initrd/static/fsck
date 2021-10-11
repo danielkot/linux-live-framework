@@ -2,7 +2,6 @@
 
 dev=$1
 [ "$dev" = "" ] && exit 1
-[ ! -b "$dev" ] && exit 1
 
 fs=$(blkid "$dev" | grep -o ' TYPE=".*' | cut -f 2 -d '"')
 
