@@ -2,13 +2,14 @@
 
 export PATH=".:/:/usr/sbin:/usr/bin:/sbin:/bin"
 export LD_LIBRARY_PATH="/lib:/lib/i386-linux-gnu:/lib64:/lib64/x86_64-linux-gnu:/usr/lib/i386-linux-gnu:/usr/lib64/x86_64-linux-gnu"
-export MEMORY=/memory
-export CHANGES_MNT=${MEMORY}/changes
-export CHANGES=${CHANGES_MNT}/changes
-export WORK=${CHANGES_MNT}/work
-export UNION=${MEMORY}/union
-export DATAMNT=${MEMORY}/data
-export SYSTEM=${MEMORY}/system
+export MEMORY="/memory"
+export MODULES="${MEMORY}/modules"
+export CHANGES_MNT="${MEMORY}/changes"
+export CHANGES="${CHANGES_MNT}/changes"
+export WORK="${CHANGES_MNT}/work"
+export UNION="${MEMORY}/union"
+export DATAMNT="${MEMORY}/data"
+export SYSTEM="${MEMORY}/system"
 
 . /lib/.config
 
@@ -106,14 +107,15 @@ fi
 mdadm --assemble --scan
 sleep 0.5
 debug_shell
+echo ""
 for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
-	echo "Searching ${DISTRO} in ${i} ..."
+	echo "Searching ${DISTRO} in ${i} "
 	mount -o ro ${i} ${DATAMNT} 2>/dev/null
 	sleep 0.5
 	if [ -e ${DATAMNT}/${DISTRO}/system.sfs ]; then
 		echo "Found ${DISTRO} in ${i}"
-		grep -q fsck /proc/cmdline && fsck ${i}
-		mount -o remount,rw ${DATAMNT}
+		grep -q fsck /proc/cmdline && fsck ${i} || true
+		mount -o remount,rw ${DATAMNT} || true
 		mount ${DATAMNT}/${DISTRO}/system.sfs ${SYSTEM}
 		sleep 0.5
 		break
@@ -121,11 +123,23 @@ for i in `blkid | cut -d: -f1 | sort | grep -vE "loop|zram|ram"`; do
 		umount -f ${DATAMNT} 2>/dev/null
 	fi
 done
+echo "Trying to mount modules..."
+if ls ${DATAMNT}/${DISTRO}/modules | grep -q ".sfs"; then
+	for i in `find ${DATAMNT}/${DISTRO}/modules -type f -name "*.sfs" | sort`; do
+		mkdir -p ${MODULES}/`basename ${i}`
+		echo "Mounting `basename ${i}`"
+		mount ${i} ${MODULES}/`basename ${i}`
+	done
+fi
 debug_shell
 persistent_changes ${SYSTEM} ${CHANGES_MNT}
 mkdir -p ${CHANGES} ${WORK}
 debug_shell
-mount -t overlay -o lowerdir=${SYSTEM},upperdir=${CHANGES},workdir=${WORK} overlay ${UNION}
+if mount | grep -q ${MODULES}; then
+	mount -t overlay -o lowerdir=${SYSTEM}:`find ${MODULES} -mindepth 1 -maxdepth 1 | tac | tr "\n" ":" | sed -r "s/:$//"`,upperdir=${CHANGES},workdir=${WORK} overlay ${UNION}
+else
+	mount -t overlay -o lowerdir=${SYSTEM},upperdir=${CHANGES},workdir=${WORK} overlay ${UNION}
+fi
 debug_shell
 echo "Starting ${DISTRO}"
 sleep 2
