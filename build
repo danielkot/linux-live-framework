@@ -40,7 +40,7 @@ cd ..
 DATA="`mktemp -d`"
 BOOT="${DATA}"
 temp_root="`mktemp -d`"
-mkdir -p ${temp_root}/rootfs ${DATA}/changes ${DATA}/${DISTRO}
+mkdir -p ${temp_root}/rootfs ${DATA}/changes ${DATA}/${DISTRO} ${DATA}/${DISTRO}/modules
 echo "rsync --force -aA --exclude=/dev/* --exclude=/proc/* --exclude=/sys/* --exclude=/tmp/* / ${temp_root}/rootfs" > ${temp_root}/rsync_cmd
 chmod +x -R ${temp_root}/rsync_cmd copyroot
 cp -rf copyroot/* ${temp_root}/rootfs
