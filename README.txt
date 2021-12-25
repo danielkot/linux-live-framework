@@ -14,7 +14,7 @@ Note:
 		- rsync,
 		- syslinux-utils,
 		- bash,
-		- (Optionally) mdadm.
+		- (Optional) mdadm.
 	* Your linux kernel must have overlayfs and squashfs module.
 		- If xz compression is not found, mksquashfs uses default settings - mostly gzip.
 	* Installer is included in this project.
